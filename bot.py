@@ -11,9 +11,9 @@ WEBHOOK_URL = os.environ.get("WEBHOOK_URL")
 BASE_URL = os.environ.get("STATIC_BASE_URL") or "https://your-project.onrender.com"
 
 products = {
-    "Jacket/Skirt": [("Комплект с шерстью", f"{BASE_URL}/static/jacket_skirt.jpg", 1200000)],
-    "Suit": [("Тёмный костюм", f"{BASE_URL}/static/suit.jpg", 1500000)],
-    "Dress": [("Трикотажное платье", f"{BASE_URL}/static/dress.jpg", 950000)],
+    "Jacket/Skirt": [("Комплект с шерстью", f"{BASE_URL}/static/jacket_skirt.jpg", 20000)],
+    "Suit": [("Тёмный костюм", f"{BASE_URL}/static/suit.jpg", 30000)],
+    "Dress": [("Трикотажное платье", f"{BASE_URL}/static/dress.jpg", 8000)],
 }
 
 app_bot = ApplicationBuilder().token(TOKEN).build()
