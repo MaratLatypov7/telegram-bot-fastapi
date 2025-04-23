@@ -46,11 +46,14 @@ async def telegram_webhook(request: Request):
     await app_bot.process_update(update)
     return {"ok": True}
 
-# Правильная регистрация post_init (PTB 20.6)
-async def setup_webhook(application):
-    await application.bot.set_webhook(WEBHOOK_URL)
+# Устойчивый запуск без post_init
+async def set_webhook_and_run():
+    await app_bot.initialize()
+    await app_bot.bot.set_webhook(WEBHOOK_URL)
+    await app_bot.start()
 
-app_bot.post_init(setup_webhook)
+import asyncio
+asyncio.get_event_loop().create_task(set_webhook_and_run())
 
 if __name__ == "__main__":
     import uvicorn
