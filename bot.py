@@ -1,5 +1,6 @@
 import os
 from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
@@ -7,10 +8,12 @@ TOKEN = os.environ.get("YOUR_TOKEN")
 WEBHOOK_PATH = "/telegram"
 WEBHOOK_URL = os.environ.get("WEBHOOK_URL")
 
+BASE_URL = os.environ.get("STATIC_BASE_URL") or "https://your-project.onrender.com"
+
 products = {
-    "Jacket/Skirt": [("Комплект с шерстью", "https://chat.openai.com/mnt/data/jacket_skirt.jpeg", 1200000)],
-    "Suit": [("Тёмный костюм", "https://chat.openai.com/mnt/data/suit.jpeg", 1500000)],
-    "Dress": [("Трикотажное платье", "https://chat.openai.com/mnt/data/dress.jpeg", 950000)],
+    "Jacket/Skirt": [("Комплект с шерстью", f"{BASE_URL}/static/jacket_skirt.jpg", 1200000)],
+    "Suit": [("Тёмный костюм", f"{BASE_URL}/static/suit.jpg", 1500000)],
+    "Dress": [("Трикотажное платье", f"{BASE_URL}/static/dress.jpg", 950000)],
 }
 
 app_bot = ApplicationBuilder().token(TOKEN).build()
@@ -50,6 +53,7 @@ app_bot.add_handler(CallbackQueryHandler(handle_category, pattern="^cat:"))
 app_bot.add_handler(CallbackQueryHandler(handle_purchase, pattern="^buy:"))
 
 fastapi_app = FastAPI()
+fastapi_app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @fastapi_app.post(WEBHOOK_PATH)
 async def telegram_webhook(request: Request):
