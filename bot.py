@@ -1,4 +1,3 @@
-
 import os
 from fastapi import FastAPI, Request
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -23,10 +22,23 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_category(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+
     cat = query.data.split(":")[1]
-    for name, photo, price in products[cat]:
+    items = products.get(cat, [])
+    if not items:
+        await query.message.reply_text("Категория пока пуста.")
+        return
+
+    for name, photo, price in items:
         keyboard = [[InlineKeyboardButton("Купить", callback_data=f"buy:{name}")]]
-        await query.message.reply_photo(photo=photo, caption=f"{name}\nЦена: {price:,} RUB", reply_markup=InlineKeyboardMarkup(keyboard))
+        try:
+            await query.message.reply_photo(
+                photo=photo,
+                caption=f"{name}\nЦена: {price:,} RUB",
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+        except Exception as e:
+            await query.message.reply_text(f"Ошибка при загрузке товара: {e}")
 
 async def handle_purchase(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -46,7 +58,6 @@ async def telegram_webhook(request: Request):
     await app_bot.process_update(update)
     return {"ok": True}
 
-# Устойчивый запуск без post_init
 async def set_webhook_and_run():
     await app_bot.initialize()
     await app_bot.bot.set_webhook(WEBHOOK_URL)
