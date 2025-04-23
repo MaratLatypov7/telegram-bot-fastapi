@@ -46,9 +46,11 @@ async def telegram_webhook(request: Request):
     await app_bot.process_update(update)
     return {"ok": True}
 
-@app_bot.post_init
+# Исправленный способ подключения webhook
 async def setup_webhook(application):
     await application.bot.set_webhook(WEBHOOK_URL)
+
+app_bot.post_init(setup_webhook)
 
 if __name__ == "__main__":
     import uvicorn
